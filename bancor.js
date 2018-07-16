@@ -82,6 +82,10 @@ Bancor.prototype = {
             }
         }
 
+        if(from.amount.isNaN()){
+            throw new Error("invalid exchange");
+        }
+
         if(_to != from.symbol){
             return this.convert(from, _to);
         }
