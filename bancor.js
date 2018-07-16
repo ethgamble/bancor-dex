@@ -173,7 +173,7 @@ Bancor.prototype = {
 
 var bancor = new Bancor();
 
-console.log(bancor.convert({amount: new BigNumber(1), symbol: 'EOS'}, 'EOS').amount.toString(10), 'EOS');
-console.log(bancor.convert({amount: new BigNumber(1), symbol: 'EOS'}, 'RAM').amount.toString(10), 'RAM');
-console.log(bancor.convert({amount: new BigNumber(1), symbol: 'RAM'}, 'EOS').amount.toString(10), 'EOS');
-console.log(bancor.convert({amount: new BigNumber(1), symbol: 'RAM'}, 'RAM').amount.toString(10), 'RAM');
+console.log('convert 1 EOS to EOS', bancor.convert({amount: new BigNumber(1), symbol: 'EOS'}, 'EOS').amount.toString(10), 'EOS');
+console.log('convert 1 EOS to RAM(byte)',bancor.convert({amount: new BigNumber(1), symbol: 'EOS'}, 'RAM').amount.toString(10), 'RAM');
+console.log('convert 1 RAM(byte) to EOS',bancor.convert({amount: new BigNumber(1), symbol: 'RAM'}, 'EOS').amount.toString(10), 'EOS');
+console.log('convert 1 RAM(byte) to RAM(byte)',bancor.convert({amount: new BigNumber(1), symbol: 'RAM'}, 'RAM').amount.toString(10), 'RAM');
