@@ -1,7 +1,9 @@
 "use strict";
 
-var BigNumber = require('bignumber.js');
+// https://github.com/EOSIO/eos/blob/master/contracts/eosio.system/exchange_state.hpp
+// https://github.com/EOSIO/eos/blob/master/contracts/eosio.system/exchange_state.cpp
 
+var BigNumber = require('bignumber.js');
 
 var Bancor = function(){
     this.weight = new BigNumber(0.5);
@@ -12,20 +14,6 @@ var Bancor = function(){
 };
 
 Bancor.prototype = {
-    //real_type R(supply.amount);
-    //real_type C(c.balance.amount + in.amount);
-    //real_type F(c.weight/1000.0);
-    //real_type T(in.amount);
-    //real_type ONE(1.0);
-    //
-    //real_type E = -R * (ONE - std::pow( ONE + T / C, F) );
-    ////print( "E: ", E, "\n");
-    //int64_t issued = int64_t(E);
-    //
-    //supply.amount += issued;
-    //c.balance.amount += in.amount;
-    //
-    //return asset( issued, supply.symbol );
     convertToExchange: function(_c, _in){
         var R = this.supply.amount;
         var C = _c.balance.amount.plus(_in.amount);
@@ -33,18 +21,8 @@ Bancor.prototype = {
         var T = _in.amount;
         var ONE = new BigNumber(1);
 
-        //console.log(R.toString(10));
-        //console.log(C.toString(10));
-        //console.log(F.toString(10));
-        //console.log(T.toString(10));
-        //console.log(ONE.toString(10));
-
-        //E = -R * (ONE - std::pow( ONE + T / C, F) );
-        //var E = new BigNumber(0).minus(R.mul(ONE.minus((ONE.plus(T.div(C)))).pow(F)));
         var E = new BigNumber(0).minus(R.mul(ONE.minus(new BigNumber(Math.pow(parseFloat((ONE.plus(T.div(C))).toString(10)), parseFloat(F.toString(10))).toFixed(15)))));
         var issued = E;
-
-        //console.log(issued.toString(10));
 
         this.supply.amount = this.supply.amount.plus(issued);
         if(_c.balance.symbol === this.base.balance.symbol){
@@ -56,30 +34,6 @@ Bancor.prototype = {
         }
         return {amount: issued, symbol: this.supply.symbol};
     },
-
-    //eosio_assert( in.symbol== supply.symbol, "unexpected asset symbol input" );
-
-    //real_type R(supply.amount - in.amount);
-    //real_type C(c.balance.amount);
-    //real_type F(1000.0/c.weight);
-    //real_type E(in.amount);
-    //real_type ONE(1.0);
-    //
-    //
-    //// potentially more accurate:
-    //// The functions std::expm1 and std::log1p are useful for financial calculations, for example,
-    //// when calculating small daily interest rates: (1+x)n
-    //// -1 can be expressed as std::expm1(n * std::log1p(x)).
-    //// real_type T = C * std::expm1( F * std::log1p(E/R) );
-    //
-    //real_type T = C * (std::pow( ONE + E/R, F) - ONE);
-    ////print( "T: ", T, "\n");
-    //int64_t out = int64_t(T);
-    //
-    //supply.amount -= in.amount;
-    //c.balance.amount -= out;
-    //
-    //return asset( out, c.balance.symbol );
     convertFromExchange: function(_c, _in){
         if(_in.symbol !== this.supply.symbol){
             throw new Error('unexpected asset symbol input');
@@ -161,12 +115,9 @@ Bancor.prototype = {
             }
         }
 
-
-
         if(_to != from.symbol){
             return this.convert(from, _to);
         }
-
         return from;
     }
 };
@@ -177,3 +128,4 @@ console.log('convert 1 EOS to EOS', bancor.convert({amount: new BigNumber(1), sy
 console.log('convert 1 EOS to RAM(byte)',bancor.convert({amount: new BigNumber(1), symbol: 'EOS'}, 'RAM').amount.toString(10), 'RAM');
 console.log('convert 1 RAM(byte) to EOS',bancor.convert({amount: new BigNumber(1), symbol: 'RAM'}, 'EOS').amount.toString(10), 'EOS');
 console.log('convert 1 RAM(byte) to RAM(byte)',bancor.convert({amount: new BigNumber(1), symbol: 'RAM'}, 'RAM').amount.toString(10), 'RAM');
+
